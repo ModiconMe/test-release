@@ -18,6 +18,7 @@ test {
     useJUnitPlatform()
 }
 
+
 release {
     failOnCommitNeeded = true
     failOnPublishNeeded = true
@@ -28,6 +29,7 @@ release {
     tagCommitMessage = "[Gradle Release Plugin] - creating tag: $version"
     newVersionCommitMessage = "[Gradle Release Plugin] - new version commit: $version"
     tagTemplate = '${version}'
+    versionProperties = 'version1'
     versionPropertyFile = 'gradle.properties'
     snapshotSuffix = '-SNAPSHOT'
     buildTasks = []
@@ -40,8 +42,10 @@ release {
     }
 }
 
-beforeReleaseBuild {
-    exec {
-        commandLine 'git', 'branch', "release/$version"
-    }
-}
+//beforeReleaseBuild {
+//  doLast {
+//      project.exec {
+//          commandLine 'git', 'branch', "release/$version"
+//      }
+//  }
+//}
