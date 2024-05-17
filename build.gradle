@@ -42,6 +42,6 @@ release {
 
 beforeReleaseBuild {
     exec {
-        commandLine 'git', 'checkout', "release/$version"
+        commandLine 'git', 'branch', "release/$version"
     }
 }
