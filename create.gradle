@@ -96,7 +96,7 @@ tasks.register('smartixRelease') {
         props.store(file.newWriter(), null)
 
         exec {
-            commandLine 'git', 'add-commit', "-m \"Release $version\""
+            commandLine 'git', 'commit', "-am \"Release $version\""
         }
     }
 }
