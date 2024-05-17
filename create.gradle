@@ -54,7 +54,7 @@ tasks.register('smartixRelease') {
             commandLine 'git', 'checkout', 'develop'
         }
         exec {
-            commandLine 'git', 'commit', '-m', "\"Release $version\""
+            commandLine 'git', 'commit', "-m \"Release $version\""
         }
 
         println 'Do first'
