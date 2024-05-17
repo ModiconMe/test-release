@@ -4,7 +4,6 @@ plugins {
 }
 
 group = 'pro.smartix.sale.external'
-version = '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -32,9 +31,10 @@ release {
     versionPropertyFile = 'gradle.properties'
     snapshotSuffix = '-SNAPSHOT'
     buildTasks = []
+
     pushReleaseVersionBranch = "release/$version"
 
     git {
-        requireBranch.set("develop")
+        requireBranch.set("main")
     }
 }
