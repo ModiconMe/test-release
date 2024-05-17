@@ -21,8 +21,8 @@ release {
     }
 }
 
-beforeReleaseBuild {
-  doLast {
+checkoutMergeToReleaseBranch {
+  doFirst {
       project.exec {
           commandLine 'git', 'branch', "release/$version"
       }
