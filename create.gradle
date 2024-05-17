@@ -109,5 +109,4 @@ private Object upVersionAndWriteToProps() {
     println props
 
     props.store(file.newWriter(), null)
-    it
 }
