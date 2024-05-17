@@ -39,3 +39,9 @@ release {
         requireBranch.set("develop")
     }
 }
+
+beforeReleaseBuild {
+    exec {
+        commandLine 'git', 'checkout', "release/$version"
+    }
+}
