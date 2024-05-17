@@ -102,7 +102,7 @@ private void upVersionAndWriteToProps(versionProperties) {
     def versionProperty = props.get('version') as String
     def versionArray = versionProperty.split('\\.')
 
-    if (versionArray.size() < 3) {
+    if (versionArray.size() != 3) {
         throw new IllegalArgumentException('Wrong version: ' + versionProperty)
     }
 
