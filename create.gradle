@@ -37,6 +37,7 @@ tasks.register('smartixRelease') {
         exec {
             commandLine 'git', 'checkout', "develop"
         }
+
         exec {
             commandLine 'git', 'pull', 'origin', 'develop'
         }
@@ -44,11 +45,12 @@ tasks.register('smartixRelease') {
             commandLine 'git', 'checkout', 'main'
         }
         exec {
-            commandLine 'git', 'push', 'origin', 'main'
-        }
-        exec {
             commandLine 'git', 'merge', 'origin/develop'
         }
+        exec {
+            commandLine 'git', 'push', 'origin', 'main'
+        }
+
         exec {
             commandLine 'git', 'branch', "release/$version"
         }
@@ -56,11 +58,12 @@ tasks.register('smartixRelease') {
             commandLine 'git', 'checkout', "release/$version"
         }
         exec {
-            commandLine 'git', 'push', 'origin', "release/$version"
-        }
-        exec {
             commandLine 'git', 'merge', 'origin/develop'
         }
+        exec {
+            commandLine 'git', 'push', 'origin', "release/$version"
+        }
+
         exec {
             commandLine 'git', 'checkout', 'develop'
         }
