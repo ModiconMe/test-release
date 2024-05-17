@@ -21,8 +21,8 @@ test {
     useJUnitPlatform()
 }
 
-//smartixRelease {
-//    versionProperties << 'version'
-//}
+smartixRelease {
+    versionProperties << 'version1'
+}
 
 
