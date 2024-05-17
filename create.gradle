@@ -35,6 +35,7 @@ import java.nio.file.Files
 def developBranchName = 'develop'
 def masterBranchName = 'main'
 def releaseBranchName = "release/$version"
+def versionProperties = ['version', 'version1']
 
 private ExecResult checkoutDevelop(developBranchName) {
     exec {
@@ -87,23 +88,14 @@ private void releaseDevelop(developBranchName) {
 
 tasks.register('smartixRelease') {
     doFirst {
-        def branchVersion = new ByteArrayOutputStream()
-        exec {
-            commandLine 'git' 'status' '|' 'grep' "'изменено:'" '|' 'wc' '-l'
-            standardOutput = branchVersion
-        }
-
-        println 'Status ...' + branchVersion
-
         releaseMaster(developBranchName, masterBranchName)
         releaseRelease(releaseBranchName, developBranchName)
-        upVersionAndWriteToProps()
+        upVersionAndWriteToProps(versionProperties)
         releaseDevelop(developBranchName)
     }
 }
 
-private void upVersionAndWriteToProps() {
-    def versionProperties = ['version', 'version1']
+private void upVersionAndWriteToProps(versionProperties) {
     def props = new Properties()
     def file = file("gradle.properties")
     file.withInputStream { props.load(it) }
