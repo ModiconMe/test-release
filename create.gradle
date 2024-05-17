@@ -89,11 +89,11 @@ tasks.register('smartixRelease') {
     doFirst {
         def branchVersion = new ByteArrayOutputStream()
         exec {
-            commandLine 'git', 'status', 'origin', developBranchName
+            commandLine 'git' 'status' '|' 'grep' "'изменено:'" '|' 'wc' '-l'
             standardOutput = branchVersion
         }
 
-        println branchVersion
+        println 'Status ...' + branchVersion
 
         releaseMaster(developBranchName, masterBranchName)
         releaseRelease(releaseBranchName, developBranchName)
