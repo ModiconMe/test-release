@@ -36,12 +36,14 @@ def developBranchName = 'develop'
 def masterBranchName = 'main'
 def releaseBranchName = "release/$version"
 
-tasks.register('checkoutDevelop', Exec) {
-    commandLine 'git', 'checkout', developBranchName
+private ExecResult checkoutDevelop(developBranchName) {
+    exec {
+        commandLine 'git', 'checkout', developBranchName
+    }
 }
 
-tasks.register('releaseMaster', Exec) {
-    checkoutDevelop
+private void releaseMaster(developBranchName, masterBranchName) {
+    checkoutDevelop(developBranchName)
     exec {
         commandLine 'git', 'pull', 'origin', developBranchName
     }
@@ -56,8 +58,8 @@ tasks.register('releaseMaster', Exec) {
     }
 }
 
-tasks.register('releaseRelease', Exec) {
-    checkoutDevelop
+private void releaseRelease(releaseBranchName, developBranchName) {
+    checkoutDevelop(developBranchName)
     exec {
         commandLine 'git', 'branch', releaseBranchName
     }
@@ -72,8 +74,9 @@ tasks.register('releaseRelease', Exec) {
     }
 }
 
-tasks.register('releaseDevelop', Exec) {
-    checkoutDevelop
+
+private void releaseDevelop(developBranchName) {
+    checkoutDevelop(developBranchName)
     exec {
         commandLine 'git', 'commit', "-am \"Release $version\""
     }
@@ -84,10 +87,10 @@ tasks.register('releaseDevelop', Exec) {
 
 tasks.register('smartixRelease') {
     doFirst {
-        releaseMaster
-        releaseRelease
+        releaseMaster(developBranchName, masterBranchName)
+        releaseRelease(releaseBranchName, developBranchName)
         upVersionAndWriteToProps()
-        releaseDevelop
+        releaseDevelop(developBranchName)
     }
 }
 
