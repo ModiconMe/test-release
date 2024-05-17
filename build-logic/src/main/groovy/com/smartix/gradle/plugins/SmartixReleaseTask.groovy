@@ -50,6 +50,9 @@ class SmartixReleaseTask extends DefaultTask {
             commandLine 'git', 'checkout', masterBranchName
         }
         project.exec {
+            commandLine 'git', 'pull', 'origin', masterBranchName
+        }
+        project.exec {
             commandLine 'git', 'merge', "origin/$developBranchName"
         }
         project.exec {
