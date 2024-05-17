@@ -70,7 +70,7 @@ tasks.register('smartixRelease') {
     }
 }
 
-private Object upVersionAndWriteToProps() {
+private void upVersionAndWriteToProps() {
     def versionProperties = ['version', 'version1']
     def props = new Properties()
     def file = file("gradle.properties")
