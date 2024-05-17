@@ -5,7 +5,7 @@ plugins {
 
 group = 'pro.smartix.sale.external'
 
-apply  from: 'create.gradle'
+apply  from: 'release.gradle'
 
 repositories {
     mavenCentral()
