@@ -33,7 +33,7 @@ release {
     buildTasks = []
 
     pushReleaseVersionBranch = "release/$version"
-    pushReleaseVersionBranch = "main"
+//    pushReleaseVersionBranch = "main"
 
     git {
         requireBranch.set("develop")
