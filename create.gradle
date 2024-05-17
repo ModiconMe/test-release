@@ -1,54 +1,100 @@
-release {
-    failOnCommitNeeded = true
-    failOnPublishNeeded = true
-    failOnSnapshotDependencies = true
-    failOnUnversionedFiles = false
-    failOnUpdateNeeded = true
-    preTagCommitMessage = "[Gradle Release Plugin] - pre tag commit: $version"
-    tagCommitMessage = "[Gradle Release Plugin] - creating tag: $version"
-    newVersionCommitMessage = "[Gradle Release Plugin] - new version commit: $version"
-    tagTemplate = '${version}'
-    versionProperties.add('version1')
-    versionPropertyFile = 'gradle.properties'
-    snapshotSuffix = '-SNAPSHOT'
-    buildTasks = []
+import java.nio.file.Files
 
-    pushReleaseVersionBranch = "release/$version"
-//    pushReleaseVersionBranch = "main"
-
-    git {
-        requireBranch.set("develop")
-    }
-}
-
-release {
-    failOnCommitNeeded = true
-    failOnPublishNeeded = true
-    failOnSnapshotDependencies = true
-    failOnUnversionedFiles = false
-    failOnUpdateNeeded = true
-    preTagCommitMessage = "[Gradle Release Plugin] - pre tag commit: $version"
-    tagCommitMessage = "[Gradle Release Plugin] - creating tag: $version"
-    newVersionCommitMessage = "[Gradle Release Plugin] - new version commit: $version"
-    tagTemplate = '${version}'
-    versionProperties.add('version1')
-    versionPropertyFile = 'gradle.properties'
-    snapshotSuffix = '-SNAPSHOT'
-    buildTasks = []
-
+//release {
+//    failOnCommitNeeded = true
+//    failOnPublishNeeded = true
+//    failOnSnapshotDependencies = true
+//    failOnUnversionedFiles = true
+//    failOnUpdateNeeded = true
+//    preTagCommitMessage = "[Gradle Release Plugin] - pre tag commit: $version"
+//    tagCommitMessage = "[Gradle Release Plugin] - creating tag: $version"
+//    newVersionCommitMessage = "[Gradle Release Plugin] - new version commit: $version"
+//    tagTemplate = '${version}'
+//    versionProperties.add('version1')
+//    versionPropertyFile = 'gradle.properties'
+//    snapshotSuffix = '-SNAPSHOT'
+//    buildTasks = []
+//
 //    pushReleaseVersionBranch = "release/$version"
-    pushReleaseVersionBranch = "main"
+////    pushReleaseVersionBranch = "main"
+//
+//    git {
+//        requireBranch.set("develop")
+//    }
+//}
+//
+//
+//checkoutMergeToReleaseBranch {
+//    doFirst {
+//        project.exec {
+//            commandLine 'git', 'branch', "release/$version"
+//        }
+//    }
+//}
 
-    git {
-        requireBranch.set("develop")
+tasks.register('smartixRelease') {
+    doFirst {
+        println 'Do first'
+        exec {
+            commandLine 'git', 'checkout', "develop"
+        }
+        exec {
+            commandLine 'git', 'pull', 'origin', 'develop'
+        }
+        exec {
+            commandLine 'git', 'branch', "release/$version"
+        }
+        exec {
+            commandLine 'git', 'checkout', "release/$version"
+        }
+        exec {
+            commandLine 'git', 'merge', 'origin/develop'
+        }
+        exec {
+            commandLine 'git', 'checkout', 'develop'
+        }
+
+        println 'Do first'
+
+        def versionProperties = ['version', 'version1']
+        def props = new Properties()
+        def file = file("gradle.properties")
+        file.withInputStream { props.load(it) }
+        def versionProperty = props.get('version') as String
+        def versionArray = versionProperty.split('\\.')
+
+        if (versionArray.size() < 3) {
+            throw new IllegalArgumentException('Wrong version: ' + versionProperty)
+        }
+
+        def firstDigit = versionArray[0] as int
+        def secondDigit = versionArray[1] as int
+        def thirdDigit = versionArray[2] as int
+
+        if (firstDigit > 9 || firstDigit < 0 || secondDigit > 9 || secondDigit < 0 || thirdDigit > 9 || thirdDigit < 0) {
+            throw new IllegalArgumentException('Wrong version: ' + versionProperty)
+        }
+
+        if (secondDigit == 9 && thirdDigit == 9) {
+            firstDigit++
+            secondDigit = 0
+            thirdDigit = 0
+        } else if (thirdDigit == 9) {
+            secondDigit++
+            thirdDigit = 0
+        } else if (thirdDigit < 9) {
+            thirdDigit++
+        }
+
+        def newVersion = "$firstDigit.$secondDigit.$thirdDigit"
+
+        for (final String name in versionProperties) {
+            props.setProperty(name, newVersion)
+        }
+        println props
+
+        props.store(file.newWriter(), null)
+
+
     }
-}
-
-
-checkoutMergeToReleaseBranch {
-  doFirst {
-      project.exec {
-          commandLine 'git', 'branch', "release/$version"
-      }
-  }
 }
