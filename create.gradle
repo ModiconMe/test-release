@@ -87,6 +87,14 @@ private void releaseDevelop(developBranchName) {
 
 tasks.register('smartixRelease') {
     doFirst {
+        def branchVersion = new ByteArrayOutputStream()
+        exec {
+            commandLine 'git', 'status', 'origin', developBranchName
+            standardOutput = branchVersion
+        }
+
+        println branchVersion
+
         releaseMaster(developBranchName, masterBranchName)
         releaseRelease(releaseBranchName, developBranchName)
         upVersionAndWriteToProps()
