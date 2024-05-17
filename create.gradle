@@ -53,9 +53,6 @@ tasks.register('smartixRelease') {
         exec {
             commandLine 'git', 'checkout', 'develop'
         }
-        exec {
-            commandLine 'git', 'commit', "-m \"Release $version\""
-        }
 
         println 'Do first'
 
@@ -98,6 +95,8 @@ tasks.register('smartixRelease') {
 
         props.store(file.newWriter(), null)
 
-
+        exec {
+            commandLine 'git', 'commit', "-m \"Release $version\""
+        }
     }
 }
