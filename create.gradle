@@ -34,38 +34,41 @@ import java.nio.file.Files
 
 tasks.register('smartixRelease') {
     doFirst {
+        def developBranchName = 'develop'
+        def masterBranchName = 'main'
+        def releaseBranchName = "release/$version"
         exec {
-            commandLine 'git', 'checkout', "develop"
+            commandLine 'git', 'checkout', developBranchName
         }
 
         exec {
-            commandLine 'git', 'pull', 'origin', 'develop'
+            commandLine 'git', 'pull', 'origin', developBranchName
         }
         exec {
-            commandLine 'git', 'checkout', 'main'
+            commandLine 'git', 'checkout', masterBranchName
         }
         exec {
-            commandLine 'git', 'merge', 'origin/develop'
+            commandLine 'git', 'merge', "origin/$developBranchName"
         }
         exec {
-            commandLine 'git', 'push', 'origin', 'main'
+            commandLine 'git', 'push', 'origin', masterBranchName
         }
 
         exec {
-            commandLine 'git', 'branch', "release/$version"
+            commandLine 'git', 'branch', releaseBranchName
         }
         exec {
-            commandLine 'git', 'checkout', "release/$version"
+            commandLine 'git', 'checkout', releaseBranchName
         }
         exec {
-            commandLine 'git', 'merge', 'origin/develop'
+            commandLine 'git', 'merge', "origin/$developBranchName"
         }
         exec {
             commandLine 'git', 'push', 'origin', "release/$version"
         }
 
         exec {
-            commandLine 'git', 'checkout', 'develop'
+            commandLine 'git', 'checkout', developBranchName
         }
 
         upVersionAndWriteToProps()
@@ -74,7 +77,7 @@ tasks.register('smartixRelease') {
             commandLine 'git', 'commit', "-am \"Release $version\""
         }
         exec {
-            commandLine 'git', 'push', 'origin', 'develop'
+            commandLine 'git', 'push', 'origin', developBranchName
         }
     }
 }
