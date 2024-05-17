@@ -1,11 +1,12 @@
 plugins {
     id 'java'
 //    id 'net.researchgate.release' version '3.0.2'
+    id 'com.smartix.gradle.plugins.smartix-release'
 }
 
 group = 'pro.smartix.sale.external'
 
-apply  from: 'release.gradle'
+//apply  from: 'release.gradle'
 
 repositories {
     mavenCentral()

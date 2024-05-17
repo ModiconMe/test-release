@@ -1,43 +1,18 @@
-import java.nio.file.Files
-
-//release {
-//    failOnCommitNeeded = true
-//    failOnPublishNeeded = true
-//    failOnSnapshotDependencies = true
-//    failOnUnversionedFiles = true
-//    failOnUpdateNeeded = true
-//    preTagCommitMessage = "[Gradle Release Plugin] - pre tag commit: $version"
-//    tagCommitMessage = "[Gradle Release Plugin] - creating tag: $version"
-//    newVersionCommitMessage = "[Gradle Release Plugin] - new version commit: $version"
-//    tagTemplate = '${version}'
-//    versionProperties.add('version1')
-//    versionPropertyFile = 'gradle.properties'
-//    snapshotSuffix = '-SNAPSHOT'
-//    buildTasks = []
-//
-//    pushReleaseVersionBranch = "release/$version"
-////    pushReleaseVersionBranch = "main"
-//
-//    git {
-//        requireBranch.set("develop")
-//    }
-//}
-//
-//
-//checkoutMergeToReleaseBranch {
-//    doFirst {
-//        project.exec {
-//            commandLine 'git', 'branch', "release/$version"
-//        }
-//    }
-//}
-
 def developBranchName = 'develop'
 def masterBranchName = 'main'
 def releaseBranchName = "release/$version"
 def versionProperties = ['version', 'version1']
 
-private ExecResult checkoutDevelop(developBranchName) {
+tasks.register('smartixRelease') {
+    doFirst {
+        releaseMaster(developBranchName, masterBranchName)
+        releaseRelease(releaseBranchName, developBranchName)
+        upVersionAndWriteToProps(versionProperties)
+        releaseDevelop(developBranchName)
+    }
+}
+
+private void checkoutDevelop(developBranchName) {
     exec {
         commandLine 'git', 'checkout', developBranchName
     }
@@ -83,15 +58,6 @@ private void releaseDevelop(developBranchName) {
     }
     exec {
         commandLine 'git', 'push', 'origin', developBranchName
-    }
-}
-
-tasks.register('smartixRelease') {
-    doFirst {
-        releaseMaster(developBranchName, masterBranchName)
-        releaseRelease(releaseBranchName, developBranchName)
-        upVersionAndWriteToProps(versionProperties)
-        releaseDevelop(developBranchName)
     }
 }
 

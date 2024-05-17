@@ -1,2 +1,10 @@
+pluginManagement {
+    repositories.gradlePluginPortal()
+
+    if (new File(rootDir, "build-logic").exists()) {
+        includeBuild("build-logic")
+    }
+}
+
 rootProject.name = 'test-release'
 

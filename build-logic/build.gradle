@@ -1,0 +1,21 @@
+plugins {
+    id("groovy-gradle-plugin")
+    id("java-gradle-plugin")
+    id("groovy")
+}
+
+
+repositories {
+    gradlePluginPortal()
+}
+
+group = 'com.smartix.gradle.plugins'
+
+gradlePlugin {
+    plugins {
+        create('SmartixReleasePlugin') {
+            id = "${project.group}.smartix-release"
+            implementationClass = "${project.group}.${name}"
+        }
+    }
+}
