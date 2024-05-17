@@ -12,7 +12,7 @@ class SmartixReleaseTask extends DefaultTask {
     @Input
     private final def masterBranchName = 'main'
     @Input
-    private final def versionProperties = ['version', 'version1']
+    private final def versionProperties = ['version']
 
     def getDevelopBranchName() {
         return developBranchName
