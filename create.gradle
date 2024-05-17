@@ -32,60 +32,62 @@ import java.nio.file.Files
 //    }
 //}
 
+def developBranchName = 'develop'
+def masterBranchName = 'main'
+def releaseBranchName = "release/$version"
+
 tasks.register('checkoutDevelop', Exec) {
-    def developBranchName = 'develop'
     commandLine 'git', 'checkout', developBranchName
 }
-//tasks.register('checkoutDevelop')
+
+tasks.register('releaseMaster') {
+    checkoutDevelop
+    exec {
+        commandLine 'git', 'pull', 'origin', developBranchName
+    }
+    exec {
+        commandLine 'git', 'checkout', masterBranchName
+    }
+    exec {
+        commandLine 'git', 'merge', "origin/$developBranchName"
+    }
+    exec {
+        commandLine 'git', 'push', 'origin', masterBranchName
+    }
+}
+
+tasks.register('releaseRelease') {
+    checkoutDevelop
+    exec {
+        commandLine 'git', 'branch', releaseBranchName
+    }
+    exec {
+        commandLine 'git', 'checkout', releaseBranchName
+    }
+    exec {
+        commandLine 'git', 'merge', "origin/$developBranchName"
+    }
+    exec {
+        commandLine 'git', 'push', 'origin', releaseBranchName
+    }
+}
+
+tasks.register('releaseDevelop') {
+    checkoutDevelop
+    exec {
+        commandLine 'git', 'commit', "-am \"Release $version\""
+    }
+    exec {
+        commandLine 'git', 'push', 'origin', developBranchName
+    }
+}
 
 tasks.register('smartixRelease') {
     doFirst {
-        def developBranchName = 'develop'
-        def masterBranchName = 'main'
-        def releaseBranchName = "release/$version"
-//        exec {
-//            commandLine 'git', 'checkout', developBranchName
-//        }
-        checkoutDevelop
-        exec {
-            commandLine 'git', 'pull', 'origin', developBranchName
-        }
-        exec {
-            commandLine 'git', 'checkout', masterBranchName
-        }
-        exec {
-            commandLine 'git', 'merge', "origin/$developBranchName"
-        }
-        exec {
-            commandLine 'git', 'push', 'origin', masterBranchName
-        }
-
-        exec {
-            commandLine 'git', 'branch', releaseBranchName
-        }
-        exec {
-            commandLine 'git', 'checkout', releaseBranchName
-        }
-        exec {
-            commandLine 'git', 'merge', "origin/$developBranchName"
-        }
-        exec {
-            commandLine 'git', 'push', 'origin', "release/$version"
-        }
-
-//        exec {
-//            commandLine 'git', 'checkout', developBranchName
-//        }
-        checkoutDevelop
-
+        releaseMaster
+        releaseRelease
         upVersionAndWriteToProps()
-
-        exec {
-            commandLine 'git', 'commit', "-am \"Release $version\""
-        }
-        exec {
-            commandLine 'git', 'push', 'origin', developBranchName
-        }
+        releaseDevelop
     }
 }
 
