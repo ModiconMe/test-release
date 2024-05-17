@@ -28,37 +28,54 @@ class SmartixReleaseTask extends DefaultTask {
 
     @TaskAction
     void apply() {
-        checkoutDevelop(project)
-        release(project, masterBranchName)
-        release(project, "release/${project.property('version')}")
-        upVersionAndWriteToProps(project)
-        releaseDevelop(project)
+        checkoutDevelop()
+        releaseMaster()
+        releaseRelease()
+        upVersionAndWriteToProps()
+        releaseDevelop()
     }
 
-    private void checkoutDevelop(Project project) {
+    private void checkoutDevelop() {
         project.exec {
             commandLine 'git', 'checkout', developBranchName
         }
     }
 
-    private void release(Project project, String releaseBranch) {
-        checkoutDevelop(project)
+    private void releaseMaster() {
+        checkoutDevelop()
         project.exec {
             commandLine 'git', 'pull', 'origin', developBranchName
         }
         project.exec {
-            commandLine 'git', 'checkout', releaseBranch
+            commandLine 'git', 'checkout', masterBranchName
         }
         project.exec {
             commandLine 'git', 'merge', "origin/$developBranchName"
         }
         project.exec {
-            commandLine 'git', 'push', 'origin', releaseBranch
+            commandLine 'git', 'push', 'origin', masterBranchName
         }
     }
 
-    private void releaseDevelop(Project project) {
-        checkoutDevelop(project)
+    private void releaseRelease() {
+        def releaseBranchName = "release/${project.property('version')}"
+        checkoutDevelop()
+        project.exec {
+            commandLine 'git', 'branch', releaseBranchName
+        }
+        project.exec {
+            commandLine 'git', 'checkout', releaseBranchName
+        }
+        project.exec {
+            commandLine 'git', 'merge', "origin/$developBranchName"
+        }
+        project.exec {
+            commandLine 'git', 'push', 'origin', releaseBranchName
+        }
+    }
+
+    private void releaseDevelop() {
+        checkoutDevelop()
         project.exec {
             commandLine 'git', 'commit', "-am \"Release ${project.property('version')}\""
         }
@@ -67,7 +84,7 @@ class SmartixReleaseTask extends DefaultTask {
         }
     }
 
-    private void upVersionAndWriteToProps(Project project) {
+    private void upVersionAndWriteToProps() {
         def props = new Properties()
         def file = project.file("gradle.properties")
         file.withInputStream { props.load(it) }
