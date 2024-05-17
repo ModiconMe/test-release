@@ -1,0 +1,40 @@
+plugins {
+    id 'java'
+    id 'net.researchgate.release' version '3.0.2'
+}
+
+group = 'pro.smartix.sale.external'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+release {
+    failOnCommitNeeded = false
+    failOnPublishNeeded = true
+    failOnSnapshotDependencies = true
+    failOnUnversionedFiles = false
+    failOnUpdateNeeded = true
+    preTagCommitMessage = "[Gradle Release Plugin] - pre tag commit: $version"
+    tagCommitMessage = "[Gradle Release Plugin] - creating tag: $version"
+    newVersionCommitMessage = "[Gradle Release Plugin] - new version commit: $version"
+    tagTemplate = '${version}'
+    versionPropertyFile = 'gradle.properties'
+    snapshotSuffix = '-SNAPSHOT'
+    buildTasks = []
+    pushReleaseVersionBranch = "release/$version"
+
+    git {
+        requireBranch.set("develop")
+    }
+}
