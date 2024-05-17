@@ -32,15 +32,21 @@ import java.nio.file.Files
 //    }
 //}
 
+tasks.register('checkoutDevelop', Exec) {
+    def developBranchName = 'develop'
+    commandLine 'git', 'checkout', developBranchName
+}
+//tasks.register('checkoutDevelop')
+
 tasks.register('smartixRelease') {
     doFirst {
         def developBranchName = 'develop'
         def masterBranchName = 'main'
         def releaseBranchName = "release/$version"
-        exec {
-            commandLine 'git', 'checkout', developBranchName
-        }
-
+//        exec {
+//            commandLine 'git', 'checkout', developBranchName
+//        }
+        checkoutDevelop
         exec {
             commandLine 'git', 'pull', 'origin', developBranchName
         }
@@ -67,9 +73,10 @@ tasks.register('smartixRelease') {
             commandLine 'git', 'push', 'origin', "release/$version"
         }
 
-        exec {
-            commandLine 'git', 'checkout', developBranchName
-        }
+//        exec {
+//            commandLine 'git', 'checkout', developBranchName
+//        }
+        checkoutDevelop
 
         upVersionAndWriteToProps()
 
