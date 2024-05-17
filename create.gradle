@@ -98,5 +98,8 @@ tasks.register('smartixRelease') {
         exec {
             commandLine 'git', 'commit', "-am \"Release $version\""
         }
+        exec {
+            commandLine 'git', 'push', "origin/develop"
+        }
     }
 }
