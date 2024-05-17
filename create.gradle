@@ -40,7 +40,7 @@ tasks.register('checkoutDevelop', Exec) {
     commandLine 'git', 'checkout', developBranchName
 }
 
-tasks.register('releaseMaster') {
+tasks.register('releaseMaster', Exec) {
     checkoutDevelop
     exec {
         commandLine 'git', 'pull', 'origin', developBranchName
@@ -56,7 +56,7 @@ tasks.register('releaseMaster') {
     }
 }
 
-tasks.register('releaseRelease') {
+tasks.register('releaseRelease', Exec) {
     checkoutDevelop
     exec {
         commandLine 'git', 'branch', releaseBranchName
@@ -72,7 +72,7 @@ tasks.register('releaseRelease') {
     }
 }
 
-tasks.register('releaseDevelop') {
+tasks.register('releaseDevelop', Exec) {
     checkoutDevelop
     exec {
         commandLine 'git', 'commit', "-am \"Release $version\""
