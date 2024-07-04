@@ -22,7 +22,7 @@ test {
 }
 
 smartixRelease {
-    otherVersions << 'project_version'
+    otherVersions << 'dependency_version'
 }
 
 
