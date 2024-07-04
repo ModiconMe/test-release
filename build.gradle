@@ -22,7 +22,7 @@ test {
 }
 
 smartixRelease {
-    versionProperties << 'version1'
+    otherVersions << 'project_version'
 }
 
 

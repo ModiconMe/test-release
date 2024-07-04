@@ -12,7 +12,9 @@ class SmartixReleaseTask extends DefaultTask {
     @Input
     private final def masterBranchName = 'main'
     @Input
-    private final def versionProperties = ['version']
+    private final def projectVersionPropertyName = 'project_version'
+    @Input
+    private final def otherVersions = ['version']
 
     def getDevelopBranchName() {
         return developBranchName
@@ -22,8 +24,12 @@ class SmartixReleaseTask extends DefaultTask {
         return masterBranchName
     }
 
-    def getVersionProperties() {
-        return versionProperties
+    def getProjectVersionPropertyName() {
+        return projectVersionPropertyName
+    }
+
+    def getOtherVersions() {
+        return otherVersions
     }
 
     @TaskAction
@@ -91,7 +97,10 @@ class SmartixReleaseTask extends DefaultTask {
         def props = new Properties()
         def file = project.file("gradle.properties")
         file.withInputStream { props.load(it) }
-        def versionProperty = props.get('version') as String
+        def versionProperty = props.get(projectVersionPropertyName) as String
+        if (versionProperty == null) {
+            throw new IllegalArgumentException("Property: $projectVersionPropertyName not exists in gradle.properties")
+        }
         def versionArray = versionProperty.split('\\.')
 
         if (versionArray.size() != 3) {
@@ -119,7 +128,7 @@ class SmartixReleaseTask extends DefaultTask {
 
         def newVersion = "$firstDigit.$secondDigit.$thirdDigit"
 
-        for (final String name in versionProperties) {
+        for (final String name in otherVersions) {
             props.setProperty(name, newVersion)
         }
         println props
