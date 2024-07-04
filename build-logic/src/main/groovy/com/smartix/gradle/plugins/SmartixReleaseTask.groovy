@@ -102,6 +102,7 @@ class SmartixReleaseTask extends DefaultTask {
         if (versionProperty == null) {
             throw new IllegalArgumentException("Property: $projectVersionPropertyName not exists in gradle.properties")
         }
+        println('Current version' + versionProperty)
         def versionArray = versionProperty.split('\\.')
 
         if (versionArray.size() != 3) {
