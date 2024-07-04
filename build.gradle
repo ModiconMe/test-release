@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'pro.smartix.sale.external'
-
+project.version = project_version
 //apply  from: 'release.gradle'
 
 repositories {
