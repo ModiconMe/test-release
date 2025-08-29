@@ -41,9 +41,9 @@ get_current_version() {
 # Функция для инкремента версии
 increment_version() {
     local version=$1
-    local major=$(echo $version | cut -d'.' -f1)
-    local minor=$(echo $version | cut -d'.' -f2)
-    local patch=$(echo $version | cut -d'.' -f3)
+    local major=$(echo "$version" | cut -d'.' -f1)
+    local minor=$(echo "$version" | cut -d'.' -f2)
+    local patch=$(echo "$version" | cut -d'.' -f3)
 
     # Увеличиваем patch версию
     if [ "$patch" -lt 9 ]; then
