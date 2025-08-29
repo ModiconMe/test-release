@@ -27,6 +27,11 @@ log_step() {
     echo -e "${BLUE}=== $1 ===${NC}"
 }
 
+# Функция для экранирования специальных символов в строке для sed
+escape_sed() {
+    echo "$1" | sed -e 's/[\/&]/\\&/g'
+}
+
 # Функция для извлечения версии из gradle.properties
 get_current_version() {
     if [ ! -f "gradle.properties" ]; then
@@ -96,6 +101,10 @@ update_smartix_versions() {
 
     log_info "Поиск версий с префиксом smartix_ для обновления..."
 
+    # Экранируем специальные символы для sed
+    local escaped_old_version=$(escape_sed "$old_version")
+    local escaped_new_version=$(escape_sed "$new_version")
+
     # Обновляем все версии с префиксом smartix_ в gradle.properties
     if grep -q "smartix_.*_version=" gradle.properties; then
         log_info "Обновление версий smartix_ в gradle.properties"
@@ -109,7 +118,7 @@ update_smartix_versions() {
 
             if [ "$current_smartix_version" = "$old_version" ]; then
                 log_info "Обновление $smartix_var: $old_version → $new_version"
-                sed -i "s/^${smartix_var}=${old_version}$/${smartix_var}=${new_version}/" gradle.properties
+                sed -i "s/^${smartix_var}=${escaped_old_version}$/${smartix_var}=${escaped_new_version}/" gradle.properties
             else
                 log_warning "Версия $smartix_var ($current_smartix_version) не совпадает с project_version ($old_version), оставляем без изменений"
             fi
@@ -169,7 +178,8 @@ echo ""
 echo -e "${YELLOW}Будет выполнено:${NC}"
 echo "- Мердж develop в main"
 echo "- Создание ветки release/${RELEASE_VERSION}"
-echo "- Обновление версии в develop до $(increment_version "$RELEASE_VERSION")"
+NEXT_VERSION=$(increment_version "$RELEASE_VERSION")
+echo "- Обновление версии в develop до ${NEXT_VERSION}"
 echo ""
 echo -n "Продолжить? (y/N): "
 read confirm
@@ -178,6 +188,10 @@ if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
     log_info "Отмена выполнения скрипта"
     exit 0
 fi
+
+# Экранируем версии для использования в sed
+ESCAPED_CURRENT_VERSION=$(escape_sed "$CURRENT_VERSION")
+ESCAPED_RELEASE_VERSION=$(escape_sed "$RELEASE_VERSION")
 
 # Шаг 1: Работа с main веткой
 log_step "1. Работа с main веткой"
@@ -201,7 +215,7 @@ git pull origin develop
 
 # Обновляем project_version до релизной версии
 log_info "Обновление project_version до релизной версии: $RELEASE_VERSION"
-sed -i "s/^project_version=${CURRENT_VERSION}$/project_version=${RELEASE_VERSION}/" gradle.properties
+sed -i "s/^project_version=${ESCAPED_CURRENT_VERSION}$/project_version=${ESCAPED_RELEASE_VERSION}/" gradle.properties
 
 # Коммитим изменения с релизной версией
 git add gradle.properties
@@ -225,7 +239,8 @@ log_info "Новая версия для разработки: $RELEASE_VERSION 
 
 # Обновляем project_version в gradle.properties
 log_info "Обновление project_version в gradle.properties"
-sed -i "s/^project_version=${RELEASE_VERSION}$/project_version=${NEW_VERSION}/" gradle.properties
+ESCAPED_NEW_VERSION=$(escape_sed "$NEW_VERSION")
+sed -i "s/^project_version=${ESCAPED_RELEASE_VERSION}$/project_version=${ESCAPED_NEW_VERSION}/" gradle.properties
 
 # Обновляем версии с префиксом smartix_ в gradle.properties
 update_smartix_versions "$RELEASE_VERSION" "$NEW_VERSION"
