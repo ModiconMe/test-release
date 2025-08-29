@@ -43,6 +43,30 @@ get_current_version() {
     echo "$version"
 }
 
+# Функция для запроса версии у пользователя
+get_release_version() {
+    local default_version=$1
+    local release_version
+
+    echo ""
+    echo -e "${GREEN}Текущая версия в gradle.properties: ${default_version}${NC}"
+    read -p "Введите версию для релиза [по умолчанию: ${default_version}]: " release_version
+
+    # Если пользователь не ввел версию, используем дефолтную
+    if [ -z "$release_version" ]; then
+        release_version="$default_version"
+        echo -e "${GREEN}Используется версия по умолчанию: ${release_version}${NC}"
+    fi
+
+    # Проверяем формат версии (должна быть в формате X.Y.Z)
+    if ! echo "$release_version" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+        log_error "Неверный формат версии. Должен быть в формате X.Y.Z (например: 1.8.1)"
+        exit 1
+    fi
+
+    echo "$release_version"
+}
+
 # Функция для инкремента версии по правилам: увеличиваем последнюю цифру до 9,
 # затем увеличиваем предпоследнюю и сбрасываем последнюю в 0
 increment_version() {
@@ -132,9 +156,29 @@ check_clean_working_tree
 check_branch_exists "main"
 check_branch_exists "develop"
 
+# Получаем текущую версию из gradle.properties
+CURRENT_VERSION=$(get_current_version)
+log_info "Текущая версия в проекте: $CURRENT_VERSION"
+
+# Запрашиваем версию для релиза у пользователя
+RELEASE_VERSION=$(get_release_version "$CURRENT_VERSION")
+
+# Подтверждение действия
+echo ""
+echo -e "${YELLOW}Будет выполнено:${NC}"
+echo "- Мердж develop в main"
+echo "- Создание ветки release/${RELEASE_VERSION}"
+echo "- Обновление версии в develop до $(increment_version "$RELEASE_VERSION")"
+echo ""
+read -p "Продолжить? (y/N): " confirm
+
+if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
+    log_info "Отмена выполнения скрипта"
+    exit 0
+fi
+
 # Шаг 1: Работа с main веткой
 log_step "1. Работа с main веткой"
-log_info "Переключение на main и обновление"
 git checkout main
 git pull origin main
 
@@ -153,11 +197,15 @@ log_info "Переключение на develop"
 git checkout develop
 git pull origin develop
 
-# Получаем текущую версию
-CURRENT_VERSION=$(get_current_version)
-log_info "Текущая версия: $CURRENT_VERSION"
+# Обновляем project_version до релизной версии
+log_info "Обновление project_version до релизной версии: $RELEASE_VERSION"
+sed -i "s/^project_version=${CURRENT_VERSION}$/project_version=${RELEASE_VERSION}/" gradle.properties
 
-RELEASE_BRANCH="release/${CURRENT_VERSION}"
+# Коммитим изменения с релизной версией
+git add gradle.properties
+git commit -m "Prepare release $RELEASE_VERSION" || log_info "Нет изменений для коммита"
+
+RELEASE_BRANCH="release/${RELEASE_VERSION}"
 log_info "Создание release ветки: $RELEASE_BRANCH"
 
 git checkout -b "$RELEASE_BRANCH"
@@ -169,30 +217,24 @@ log_step "3. Обновление версии в develop"
 log_info "Переключение обратно на develop"
 git checkout develop
 
-# Инкремент версии
-NEW_VERSION=$(increment_version "$CURRENT_VERSION")
-log_info "Новая версия: $CURRENT_VERSION → $NEW_VERSION"
+# Инкремент версии для следующей разработки
+NEW_VERSION=$(increment_version "$RELEASE_VERSION")
+log_info "Новая версия для разработки: $RELEASE_VERSION → $NEW_VERSION"
 
 # Обновляем project_version в gradle.properties
 log_info "Обновление project_version в gradle.properties"
-sed -i "s/^project_version=${CURRENT_VERSION}$/project_version=${NEW_VERSION}/" gradle.properties
+sed -i "s/^project_version=${RELEASE_VERSION}$/project_version=${NEW_VERSION}/" gradle.properties
 
 # Обновляем версии с префиксом smartix_ в gradle.properties
-update_smartix_versions "$CURRENT_VERSION" "$NEW_VERSION"
-
-# Проверяем изменения
-log_info "Проверка изменений в gradle.properties:"
-git diff gradle.properties || true
+update_smartix_versions "$RELEASE_VERSION" "$NEW_VERSION"
 
 # Коммит изменений
-log_info "Создание коммита с новой версией"
 git add gradle.properties
-git commit -m "start ${NEW_VERSION}"
+git commit -m "Start ${NEW_VERSION}"
 
 log_info "Пуш изменений в origin develop"
 git push origin develop
 
 log_step "Процесс релиза завершен успешно"
-echo "Текущий релиз: $CURRENT_VERSION (ветка $RELEASE_BRANCH)"
-echo "Следующая версия: $NEW_VERSION"
-log_info "Не забудьте протестировать и завершить релиз в ветке $RELEASE_BRANCH"
+echo "Релизная версия: $RELEASE_VERSION (ветка $RELEASE_BRANCH)"
+echo "Следующая версия для разработки: $NEW_VERSION"
