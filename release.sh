@@ -158,4 +158,3 @@ git push origin develop
 echo "=== Процесс релиза завершен успешно ==="
 echo "Текущий релиз: $CURRENT_VERSION (ветка $RELEASE_BRANCH)"
 echo "Следующая версия: $NEW_VERSION"
-log_info "Не забудьте протестировать и завершить релиз в ветке $RELEASE_BRANCH"
