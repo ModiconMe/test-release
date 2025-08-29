@@ -19,10 +19,6 @@ private void checkoutDevelop(developBranchName) {
 }
 
 private void releaseMaster(developBranchName, masterBranchName) {
-    checkoutDevelop(developBranchName)
-    exec {
-        commandLine 'git', 'pull', 'origin', developBranchName
-    }
     exec {
         commandLine 'git', 'checkout', masterBranchName
     }
@@ -37,13 +33,13 @@ private void releaseMaster(developBranchName, masterBranchName) {
 private void releaseRelease(releaseBranchName, developBranchName) {
     checkoutDevelop(developBranchName)
     exec {
+        commandLine 'git', 'pull', 'origin', developBranchName
+    }
+    exec {
         commandLine 'git', 'branch', releaseBranchName
     }
     exec {
         commandLine 'git', 'checkout', releaseBranchName
-    }
-    exec {
-        commandLine 'git', 'merge', "origin/$developBranchName"
     }
     exec {
         commandLine 'git', 'push', 'origin', releaseBranchName

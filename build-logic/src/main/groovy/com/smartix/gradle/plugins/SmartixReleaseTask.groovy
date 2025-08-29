@@ -91,7 +91,7 @@ class SmartixReleaseTask extends DefaultTask {
         def props = new Properties()
         def file = project.file("gradle.properties")
         file.withInputStream { props.load(it) }
-        def versionProperty = project.version
+        def versionProperty = props.get('project_version') as String
         if (versionProperty == null) {
             throw new IllegalArgumentException("Property: project_version not exists in gradle.properties")
         }
