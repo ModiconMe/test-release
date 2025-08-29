@@ -129,23 +129,23 @@ fi
 check_clean_working_tree
 
 # Проверяем существование веток
-check_branch_exists "master"
+check_branch_exists "main"
 check_branch_exists "develop"
 
-# Шаг 1: Работа с master веткой
-log_step "1. Работа с master веткой"
-log_info "Переключение на master и обновление"
-git checkout master
-git pull origin master
+# Шаг 1: Работа с main веткой
+log_step "1. Работа с main веткой"
+log_info "Переключение на main и обновление"
+git checkout main
+git pull origin main
 
-log_info "Мердж develop в master"
-if ! git merge origin/develop -m "Merge develop into master for release"; then
-    log_error "Конфликт при мердже develop в master. Разрешите конфликты и запустите скрипт снова."
+log_info "Мердж develop в main"
+if ! git merge origin/develop -m "Merge develop into main for release"; then
+    log_error "Конфликт при мердже develop в main. Разрешите конфликты и запустите скрипт снова."
     exit 1
 fi
 
-log_info "Пуш изменений в origin master"
-git push origin master
+log_info "Пуш изменений в origin main"
+git push origin main
 
 # Шаг 2: Создание release ветки
 log_step "2. Создание release ветки"
