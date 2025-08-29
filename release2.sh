@@ -50,7 +50,8 @@ get_release_version() {
 
     echo ""
     echo -e "${GREEN}Текущая версия в gradle.properties: ${default_version}${NC}"
-    read -p "Введите версию для релиза [по умолчанию: ${default_version}]: " release_version
+    echo -n "Введите версию для релиза [по умолчанию: ${default_version}]: "
+    read release_version
 
     # Если пользователь не ввел версию, используем дефолтную
     if [ -z "$release_version" ]; then
@@ -170,7 +171,8 @@ echo "- Мердж develop в main"
 echo "- Создание ветки release/${RELEASE_VERSION}"
 echo "- Обновление версии в develop до $(increment_version "$RELEASE_VERSION")"
 echo ""
-read -p "Продолжить? (y/N): " confirm
+echo -n "Продолжить? (y/N): "
+read confirm
 
 if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
     log_info "Отмена выполнения скрипта"
