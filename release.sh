@@ -45,9 +45,17 @@ increment_version() {
     local minor=$(echo $version | cut -d'.' -f2)
     local patch=$(echo $version | cut -d'.' -f3)
 
-    # Увеличиваем минорную версию и сбрасываем патч
-    local new_minor=$((minor + 1))
-    echo "${major}.${new_minor}.0"
+    # Увеличиваем patch версию
+    if [ "$patch" -lt 9 ]; then
+        # Если patch меньше 9, просто увеличиваем его
+        patch=$((patch + 1))
+    else
+        # Если patch равен 9, увеличиваем minor и сбрасываем patch в 0
+        minor=$((minor + 1))
+        patch=0
+    fi
+
+    echo "${major}.${minor}.${patch}"
 }
 
 # Функция для обновления версий с префиксом smartix_ в gradle.properties
