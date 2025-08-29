@@ -153,7 +153,7 @@ fi
 check_clean_working_tree
 
 # Проверяем существование веток
-check_branch_exists "master"
+check_branch_exists "main"
 check_branch_exists "develop"
 
 # Получаем текущую версию из gradle.properties
@@ -166,7 +166,7 @@ RELEASE_VERSION=$(get_release_version "$CURRENT_VERSION")
 # Подтверждение действия
 echo ""
 echo -e "${YELLOW}Будет выполнено:${NC}"
-echo "- Мердж develop в master"
+echo "- Мердж develop в main"
 echo "- Создание ветки release/${RELEASE_VERSION}"
 echo "- Обновление версии в develop до $(increment_version "$RELEASE_VERSION")"
 echo ""
@@ -177,20 +177,20 @@ if [ "$confirm" != "y" ] && [ "$confirm" != "Y" ]; then
     exit 0
 fi
 
-# Шаг 1: Работа с master веткой
-log_step "1. Работа с master веткой"
-log_info "Переключение на master и обновление"
-git checkout master
-git pull origin master
+# Шаг 1: Работа с main веткой
+log_step "1. Работа с main веткой"
+log_info "Переключение на main и обновление"
+git checkout main
+git pull origin main
 
-log_info "Мердж develop в master"
-if ! git merge origin/develop -m "Merge develop into master for release"; then
-    log_error "Конфликт при мердже develop в master. Разрешите конфликты и запустите скрипт снова."
+log_info "Мердж develop в main"
+if ! git merge origin/develop -m "Merge develop into main for release"; then
+    log_error "Конфликт при мердже develop в main. Разрешите конфликты и запустите скрипт снова."
     exit 1
 fi
 
-log_info "Пуш изменений в origin master"
-git push origin master
+log_info "Пуш изменений в origin main"
+git push origin main
 
 # Шаг 2: Создание release ветки
 log_step "2. Создание release ветки"
